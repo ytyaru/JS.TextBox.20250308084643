@@ -1,0 +1,35 @@
+<textarea style="width:100%; height:95vh;">
+alert('Hello JS !!');
+console.log('Hello JS !!');
+</textarea>
+<script>
+document.querySelector('textarea').focus();
+document.addEventListener('keydown', function (ev) {
+  // 対象はテキストエリアのみ
+  if (ev.target.tagName !== 'TEXTAREA') return;
+  // タブキーが押されたときだけ
+  if (ev.keyCode !== 9) return;
+  var ta = ev.target,
+    t = ta.value,
+    // 選択範囲の先頭より前にある改行の次の位置
+    s = t.lastIndexOf('\n', ta.selectionStart - 1) + 1,
+    // 選択範囲の末尾以降にある改行の位置
+    e = t.indexOf('\n', ta.selectionEnd);
+  // 改行が見つからなければテキストの最後
+  if (e < 0) e = t.length;
+  var l = e - s; // 空行は無視
+  if (l <= 0) return;
+  var i = t.replace.apply(t.substr(s, l),
+    ev.shiftKey
+    ? [/^(?:\t| {1,4})/gm, ''] // shiftキーが押されているときは行頭のタブ1文字か空白4文字までを削除
+    : [/^(?=[^\r\n])/gm, '    ']); // 押されていなければ行頭に空白4文字追加
+  // インデント追加/削除語のテキストを反映
+  ta.value = t.substr(0, s) + i + t.substr(e);
+  // テキスト変更後の選択範囲を変更した行全体に設定
+  ta.selectionStart = s;
+  ta.selectionEnd = e + (i.length - l);
+  // フォーカス移動が発生しないように
+  ev.preventDefault();
+  return false;
+});
+</script>

@@ -23,6 +23,11 @@ console.log('Hello JavaScript !!');`),
 
     const tai = new TextareaIndent();
     tai.setup();
+//    tai.tab = 'x' // NG
+//    tai.tab = '\t\t' // NG
+    tai.tab = '  ' // OK
+    tai.tab = '    ' // OK
+//    tai.tab = '\t' // OK
 });
 window.addEventListener('beforeunload', (event) => {
     console.log('beforeunload!!');
