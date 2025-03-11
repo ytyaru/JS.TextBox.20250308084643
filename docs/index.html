@@ -21,7 +21,8 @@ const {h1,p,br,ol,li,footer,small,time,a,img} = van.tags
 window.addEventListener('DOMContentLoaded', async(event) => {
     // 最新版ほどitemsの先頭に配置する。旧版ほど末尾。
     const items = [
-        'モード切替を実装した(readOnly/Enabled。Tab,Shift+Tabの挙動をモードによってフォーカス／インデントに切り替える)',
+        'ReadOnlyモード時にcキー押下したらクリップボードコピーするようにした',
+        'モード切替を実装した(ReadOnly/Enabled。Tab,Shift+Tabの挙動をモードによってフォーカス／インデントに切り替える)',
         'カーソルが行頭にありその後ろにインデント文字があるとき、アンインデントできるようにした',
         '空行もインデント対象にするか設定できるようにした',
         '範囲選択の有無によって処理を変える',
