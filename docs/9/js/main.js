@@ -15,6 +15,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     a.e(TypeError, `msg`, ()=>{throw new TypeError(`msg`)});
     a.fin();
 
+    /*
     const code = `alert('Hello JavaScript !!');
 
 console.log('Hello JavaScript !!');
@@ -39,6 +40,7 @@ console.log('Hello JavaScript !!');
     tai.tab = '  ' // OK
     tai.tab = '    ' // OK
     tai.tab = '\t' // OK
+    */
 });
 window.addEventListener('beforeunload', (event) => {
     console.log('beforeunload!!');
