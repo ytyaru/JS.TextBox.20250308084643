@@ -1,18 +1,37 @@
 class IndentTextAreaElement extends HTMLTextAreaElement {
+    static get Modes() {return 'view edit'.split(' ')}
     constructor() {
         super();
+        this._options = this.defaultOptions;
+        /*
         this._options = {
             mode: 'view', // 'view'/'edit'
             tab: {char:'\t', size:4},
             indent: {allowEmptyLines:false},
+            switchEditModeWhenFocused: false, // フォーカスされたら編集モードに切り替える
+            switchViewModeWhenBlur: false, // フォーカスを失くしたら閲覧モードに切り替える
             file: {//テキスト出力設定（入力設定も用意するなら名前をどうするか。HTMLのattribute名も含めて）
-                charset: 'utf8-bom',
-                newline: '\n',
+                charset: 'utf-8', // charsetは基本的にUTF8(BOM無)固定
+                newline: '\n',    // windowsだけは\r\n、他は\n
                 tab: 'same',
                 name: 'some-{now}.txt',
                 lang: 'plain',
             },
         }
+        */
+        this.addEventListener('keydown', async(e)=>await this.keydown(e));
+        this.#setupDnD((value, ev) =>{console.log(el, value);this.value = value; this.focus();});
+        this.addEventListener('focus', async(e)=>{if(this.switchEditModeWhenFocused){this.mode='edit'}});
+        this.addEventListener('blur', async(e)=>{if(this.switchViewModeWhenBlur){this.mode='view'}});
+        /*
+        this.addEventListener('focus', async(e)=>{
+            console.log(`focus:${this.switchEditModeWhenFocused}`)
+            if(this.switchEditModeWhenFocused){this.mode='edit'}
+        });
+        this.addEventListener('blur', async(e)=>{
+            if(this.switchViewModeWhenBlur){this.mode='view'}
+        });
+        */
     }
     connectedCallback() {
         console.log("カスタム要素がページに追加されました。");
@@ -25,19 +44,21 @@ class IndentTextAreaElement extends HTMLTextAreaElement {
     }
     attributeChangedCallback(name, oldValue, newValue) {
         console.log(`属性 ${name} が変更されました。`);
+        if ('mode'===name) {this.mode=newValue;}
+        else if ('tab'===name) {this.tabStr=newValue;}
+        else if ('switch-edit-mode-when-focused'===name){this.switchEditModeWhenFocused=true}
+        else if ('switch-view-mode-when-blur'===name){this.switchViewModeWhenBlur=true}
+        else if ('filename'===name) {this.filename=newValue;}
+        else if ('newline'===name) {this.newline=newValue;}
     }
+    get switchEditModeWhenFocused() {return this.hasAttribute('switch-edit-mode-when-focused');}
+    set switchEditModeWhenFocused(v) {this.toggleAttribute('switch-edit-mode-when-focused',v)}
+    get switchViewModeWhenBlur() {return this.hasAttribute('switch-view-mode-when-blur');}
+    set switchViewModeWhenBlur(v) {this.toggleAttribute('switch-view-mode-when-blur',v)}
     static get observedAttributes() {
-        return ['mode','tab','file'];
+        return ['mode','tab','switch-edit-mode-when-focused','switch-view-mode-when-blur','filename','newline'];
     }
-
     get defaultOptions() { return {
-        /*
-        isSoftTab: false,
-        softTabSize: 2,
-        isTargetEmptyLines: false,
-//        mode: TextareaIndent.Modes.Enabled,
-        name: 'some-{now}.txt',
-        */
         mode: 'view', // 'view'/'edit'
         tab: {char:'\t', size:4},
         indent: {allowEmptyLines:false},
@@ -49,46 +70,45 @@ class IndentTextAreaElement extends HTMLTextAreaElement {
             lang: 'plain',
         },
     } }
-    get tab() {return this._TAB_STR}
-    set tab(v) {
-        if ('\t'===v) {this._isSoftTab=false}
-        else if (v.match(/^[ ]{1,}$/gm)) {
-            this._isSoftTab = true;
-            this._softTabSize = v.length;
+    get mode() {return this._options.mode}
+    set mode(v) {
+        if (IndentTextAreaElement.Modes.includes(v)) {
+            this._options.mode = v;
+            this.readOnly = 'view'===v;
+            this.disabled = false;
         }
-        else {throw new TypeError(`tabは半角スペース1個以上またはタブ1個のみ有効です:${v}`)}
-        this._TAB_STR = this._isSoftTab ? ' '.repeat(this._softTabSize) : '\t';
     }
-    get tabChar() {return this._options.tab.char}
-    set tabChar(v) {if ('string'===typeof v || v instanceof String) {this._options.tab.char = v}}
-    get tabSize() {return this._options.tab.size}
-    set tabSize(v) {if (Number.isNumber(v) && 1 < v && v <= 8) {this._options.tab.size = v; this.style.tabSize = v;}}
     get tabStr() {return '\t'===this.tabChar ? this.tabChar : this.tabChar.repeat(this.tabSize)}
     set tabStr(v) {
         if ('\t'===v) {this.tabChar=v;return;}
         let match = v.match(/^[ ]{2,8}$/);
-        if (match) {this.tabChar=' ';this.tabSize=v.length;}
+        if (match) {this.tabChar=' ';this.tabSize=v.length;return;}
         match = v.match(/^(hard|soft|H|S|\t| )([2-8])$/);
-        if (match) {this.#setStandardTab(match[2], ['soft','S',' '].some(v=>v===match[1]));return;}
-    }
-    #setStandardTab(size=4, isSoft=false) {
-        if (isSoft) {
-            this.tabChar = ' ';
-            this.tabSize = size;
-        } else {
-            this.tabChar = '\t';
-            this.tabSize = size;
+        if (match) {this.#setStandardTab(parseInt(match[2]), ['soft','S',' '].some(v=>v===match[1]));return;}
+        match = v.match(/^(.) ([2-8])$/);
+        if (match) {
+            this.tabChar = match[1];
+            this.tabSize = parseInt(match[2]);
         }
+        throw new TypeError(`tabの代入値は次の書式のみ有効です。\\t, /^[ ]{2,8}$/, /^(hard|soft|H|S|\t| )([2-8])$/, /^(.) ([2-8])$/: ${v}`)
     }
-    setHardTab() {this.tab='\t'}
-    setSoftTab(v) {
-        if (Number.isInteger(v) && 0 < v && v <= 8) {this.tab=' '.repeat(v)}
-        else {this.tab='\t'} // 異常値なら
+    get tabChar() {return this._options.tab.char}
+    set tabChar(v) {if ('string'===typeof v || v instanceof String) {this._options.tab.char = v}}
+    get tabSize() {return this._options.tab.size}
+    set tabSize(v) {if (Number.isInteger(v) && 1 < v && v <= 8) {this._options.tab.size = v; this.style.tabSize = v;}}
+    #setStandardTab(size=4, isSoft=false) {
+        this.tabChar = isSoft ? ' ' : '\t';
+        this.tabSize = size;
     }
+    setHardTab(v) {this.tabChar='\t';if (Number.isInteger(v) && 0 < v && v <= 8) {this.tabSize=v}}
+    setSoftTab(v) {this.tabChar=' ';if (Number.isInteger(v) && 0 < v && v <= 8) {this.tabSize=v}}
     get isTargetEmptyLines(){return this._isTargetEmptyLines}
     set isTargetEmptyLines(v){this._isTargetEmptyLines = !!v}
-//    get mode() {return this._options.mode}
-//    set mode(v) {this._options.mode = [...Object.values(TextareaIndent.Modes)].some(V=>V===v) ? v : TextareaIndent.Modes.Enabled;}
+    get filename() {return this._options.file.name}
+    set filename(v) {if (this.#isStr(v) && 0<v.length){this._options.file.name=v;}}
+    #isStr(v) {return 'string'===typeof v || v instanceof String}
+    get newline() {return this._options.file.newline}
+    set newline(v) {if(this.#isStr(v) && '\n \r\n \r'.split(' ').some(V=>V===v)){this._options.file.newline=v}}
     setup(qs) {// qs:CSS selector ['textarea.indent', 'input.indent'] 等
         for (let el of document.querySelectorAll(qs ?? 'textarea')) {
             el.addEventListener('keydown', async(e)=>await this.keydown(e));
@@ -108,14 +128,14 @@ class IndentTextAreaElement extends HTMLTextAreaElement {
             // 更新(再読込)等
             if ([...new Array(12)].some(v=>`F${v}`===e.key)){return false}
             if ('n'===e.key){
-                const name = prompt('ファイル名を入力してください。\n（{now}はタイムスタンプを意味するプレースホルダーです）', this._options.name);
+                const name = prompt('ファイル名を入力してください。\n（{now}はタイムスタンプを意味するプレースホルダーです）', this._options.file.name);
                      if (null===name){}//ESCキー等でプロンプト入力をキャンセルした
-                else if (0===name.trim().length) {this._options.name='some-{now}.txt'}
-                else {this._options.name = name}
+                else if (0===name.trim().length) {this._options.file.name='some-{now}.txt'}
+                else {this._options.file.name = name}
                 e.preventDefault(); return;
             }
             if (('c'===e.key || 'C'===e.key) && 'undefined'!==typeof Clipboard){await Clipboard.write(e.target.value); return false;}
-            if (('d'===e.key || 'D'===e.key) && 'undefined'!==typeof TextFile){TextFile.download(e.target.value, this._options.name.replace(/\{now\}/gm, ''.timestamp())); return false;}
+            if (('d'===e.key || 'D'===e.key) && 'undefined'!==typeof TextFile){TextFile.download(e.target.value, this._options.file.name.replace(/\{now\}/gm, ''.timestamp())); return false;}
             if ('Tab'!==e.key && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && 'Escape'!==e.key && ' '!==e.key && 'CapsLock'!==e.key) {e.preventDefault(); e.target.readOnly=false;}
             return false
         }
@@ -153,46 +173,46 @@ class IndentTextAreaElement extends HTMLTextAreaElement {
         //if(slct.start == slct.end && !isUn) {
         if (slct.start === slct.end) {// 範囲選択なし
             if (isUn) {// アンインデント
-                const S = end - this._TAB_STR.length;
+                const S = end - this.tabStr.length;
 //                console.log(`end..S+1:"${text.substring(end, S+1)}"`, end, S+1)
-//                console.log(`"${text.substring(end-this._TAB_STR.length, end+1)}"`)
+//                console.log(`"${text.substring(end-this.tabStr.length, end+1)}"`)
                 console.log(this.#isLineHead(text, start, end))
                 console.log(`"${lines[lineStart]}"`)
-                console.log(lines[lineStart].startsWith(this._TAB_STR))
-                if (this._TAB_STR===text.substring(S, end)) {//カーソルの後にインデント文字がある
-                    return [text.substring(0, S) + text.substring(S+this._TAB_STR.length),
-                        start - this._TAB_STR.length, end - this._TAB_STR.length]
-//                } else if (this._TAB_STR===text.substring(end-this._TAB_STR.length, end+1)) {
-//                    console.log('AAAAAAAAAA:', end, text.substring(end-this._TAB_STR.length, end+1))
-//                    return [text.substring(0, end-this._TAB_STR.length) + text.substring(end),
-//                        start - this._TAB_STR.length, end - this._TAB_STR.length]
+                console.log(lines[lineStart].startsWith(this.tabStr))
+                if (this.tabStr===text.substring(S, end)) {//カーソルの後にインデント文字がある
+                    return [text.substring(0, S) + text.substring(S+this.tabStr.length),
+                        start - this.tabStr.length, end - this.tabStr.length]
+//                } else if (this.tabStr===text.substring(end-this.tabStr.length, end+1)) {
+//                    console.log('AAAAAAAAAA:', end, text.substring(end-this.tabStr.length, end+1))
+//                    return [text.substring(0, end-this.tabStr.length) + text.substring(end),
+//                        start - this.tabStr.length, end - this.tabStr.length]
                 // 行頭でカーソル前にインデント文字がある
-//                } else if (0===end && this._TAB_STR===text.substring(0, this._TAB_STR.length)) {
-//                    return [text.substring(this._TAB_STR.length), 0, 0]
-//                } else if (this._TAB_STR===text.substring(end-this._TAB_STR.length, end+1)) {
-//                    return [text.substring(this._TAB_STR.length), Math.max(0, start-this._TAB_STR.length), Math.max(0, end-this._TAB_STR.length)]
-                } else if (this.#isLineHead(text, start, end) && lines[lineStart].startsWith(this._TAB_STR)) {
-                    //return [text.substring(this._TAB_STR.length), start, end]
-                    lines[lineStart] = lines[lineStart].substring(this._TAB_STR.length);
+//                } else if (0===end && this.tabStr===text.substring(0, this.tabStr.length)) {
+//                    return [text.substring(this.tabStr.length), 0, 0]
+//                } else if (this.tabStr===text.substring(end-this.tabStr.length, end+1)) {
+//                    return [text.substring(this.tabStr.length), Math.max(0, start-this.tabStr.length), Math.max(0, end-this.tabStr.length)]
+                } else if (this.#isLineHead(text, start, end) && lines[lineStart].startsWith(this.tabStr)) {
+                    //return [text.substring(this.tabStr.length), start, end]
+                    lines[lineStart] = lines[lineStart].substring(this.tabStr.length);
                     return [lines.join('\n'), start, end]
                 } else {return [text, start, end]}// 何もしない
             } else {// インデント
-                text = text.substring(0, slct.start) + this._TAB_STR + text.substring(slct.start, text.length);
-                slct.start += this._TAB_STR.length;
-                slct.end += this._TAB_STR.length;
+                text = text.substring(0, slct.start) + this.tabStr + text.substring(slct.start, text.length);
+                slct.start += this.tabStr.length;
+                slct.end += this.tabStr.length;
                 return [text, slct.start, slct.end]
             }
         } else {// 範囲選択あり
             for (let i=0; i<lines.length; i++) {
                 if (i < lineStart || i > lineEnd || (!this._isTargetEmptyLines && lines[i] === '')) { continue }
                 if (!isUn) {// 行頭にタブ挿入
-                    lines[i] = this._TAB_STR + lines[i]
-                    slct.start += i == lineStart ? this._TAB_STR.length : 0
-                    slct.end += this._TAB_STR.length
-                } else if (lines[i].substring(0, this._TAB_STR.length) === this._TAB_STR) {// 行頭のタブ削除
-                    lines[i] = lines[i].substring(this._TAB_STR.length)
-                    slct.start -= i == lineStart ? this._TAB_STR.length : 0
-                    slct.end -= this._TAB_STR.length
+                    lines[i] = this.tabStr + lines[i]
+                    slct.start += i == lineStart ? this.tabStr.length : 0
+                    slct.end += this.tabStr.length
+                } else if (lines[i].substring(0, this.tabStr.length) === this.tabStr) {// 行頭のタブ削除
+                    lines[i] = lines[i].substring(this.tabStr.length)
+                    slct.start -= i == lineStart ? this.tabStr.length : 0
+                    slct.end -= this.tabStr.length
                 }
             }
             text = lines.join('\n')
@@ -200,50 +220,40 @@ class IndentTextAreaElement extends HTMLTextAreaElement {
         }
     }
     // https://gorogoronyan.web.fc2.com/htmlsample/src/TestJS_dnd_text_file01.html
-    #setupDnD(el, callback) {
-        el.addEventListener('drop', event => {
-//            console.log('drop');
-//            event.target.style.cursor = 'auto';
+    #setupDnD(callback) {
+        this.addEventListener('drop', event => {
             event.preventDefault();
             event.target.focus();
-            event.target.style.backgroundColor = '#FFFFFF';
+//            event.target.style.backgroundColor = '#FFFFFF';
+            event.target.classList.remove('dragging-file');
             if (event.target.readOnly){return}
             const file = event.dataTransfer.files[0];
             const reader = new FileReader();
-            reader.onload = event => callback(event.target.result, event);
+            //reader.onload = event => callback(event.target.result, event);
+            reader.onload = event=>{this.value = event.target.result; this.focus();}
             reader.readAsText(file);
         });
-        el.addEventListener('dragover', event => event.preventDefault());
-        el.addEventListener('dragenter', event => {
-            //event.target.style.cursor = 'grabbing';
-            event.target.style.backgroundColor = '#FFFF00';
-        });
-        el.addEventListener('dragleave', event => {
-            event.target.style.backgroundColor = '#FFFFFF';
-        });
-
-
-//        el.addEventListener('dragover', event => {
-//            event.preventDefault()
-//            event.target.style.backgroundColor = '#FFFFFF';
-//        });
-        // マウスカーソルのアイコンを変えるなど必要な処理があれば入れる。
-//        el.addEventListener('dragenter', event => {
-            //event.target.style.cursor = 'grabbing';
+        this.addEventListener('dragover', event => event.preventDefault());
+        this.addEventListener('dragenter', event => {
+            event.target.classList.add('dragging-file');
+            console.log('class:',event.target.className)
+            /*
 //            event.target.style.backgroundColor = '#FFFF00';
-//        });
-//        el.addEventListener('mouseenter', event => {
-//            event.target.style.backgroundColor = '#FFFF00';
-//        });
-        /*
-        el.addEventListener('mouseleave', event => {
-        //el.addEventListener('mouseout', event => {
-            console.log('mouseleave')
-            event.target.style.backgroundColor = '#FFFFFF';
+                 if (this.disabled) {event.target.style.backgroundColor = '#CCCC00';}
+            else if (this.readOnly) {event.target.style.backgroundColor = '#EEEE00';}
+            else {event.target.style.backgroundColor = '#FFFF00';}
+            */
         });
-        */
+        this.addEventListener('dragleave', event => {
+            event.target.classList.remove('dragging-file');
+            console.log('class:',event.target.className)
+            /*
+                 if (this.disabled) {event.target.style.backgroundColor = '#CCCCCC';}
+            else if (this.readOnly) {event.target.style.backgroundColor = '#EEEEEE';}
+            else {event.target.style.backgroundColor = '#FFFFFF';}
+            */
+        });
     }
-
 }
 customElements.define('edit-or-view', IndentTextAreaElement, {extends:'textarea'});
 // <textarea is="edit-or-view"></textarea>

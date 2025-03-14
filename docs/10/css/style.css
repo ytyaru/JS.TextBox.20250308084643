@@ -44,3 +44,54 @@ textarea:read-only:focus {
     outline: 2px #000000 solid;
     background-color:#EEEEEE;
 }
+textarea.dragging-file {
+    outline: 1px #ff0000 dashed;
+    background-color: #FFFF00;
+}
+textarea.dragging-file:focus {
+    outline: 2px #ff0000 solid;
+    background-color: #FF0000;
+}
+textarea.dragging-file:read-only {
+    outline: 1px #000000 dashed;
+    background-color:#EEEE00;
+}
+textarea.dragging-file:read-only:focus {
+    outline: 2px #000000 solid;
+    background-color:#EEEE00;
+}
+/*
+*/
+
+/*
+textarea:not(.dragging-file) {
+    outline: 1px #ff0000 dashed;
+}
+textarea:not(.dragging-file):focus {
+    outline: 2px #ff0000 solid;
+}
+textarea:not(.dragging-file):read-only {
+    outline: 1px #000000 dashed;
+    background-color:#EEEEEE;
+}
+textarea:not(.dragging-file):read-only:focus {
+    outline: 2px #000000 solid;
+    background-color:#EEEEEE;
+}
+textarea.dragging-file {
+    outline: 1px #ff0000 dashed;
+    background-color: #FFFF00;
+}
+textarea.dragging-file:focus {
+    outline: 2px #ff0000 solid;
+    background-color: #FF0000;
+}
+textarea.dragging-file:read-only {
+    outline: 1px #000000 dashed;
+    background-color:#EEEE00;
+}
+textarea.dragging-file:read-only:focus {
+    outline: 2px #000000 solid;
+    background-color:#EEEE00;
+}
+*/
