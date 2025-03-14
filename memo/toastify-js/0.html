@@ -1,0 +1,49 @@
+<head>
+<link rel="stylesheet" href="../../docs/lib/toastify-js/1.9.3/min.css">
+<!--<link rel="stylesheet" href="../../docs/lib/toastify-js/1.9.3/custom.css">-->
+<script src="../../docs/lib/toastify-js/1.9.3/min.js"></script>
+</head>
+<body>
+    <p>ああああああああああ</p>
+    <p>ああああああああああ</p>
+    <!--<div id="target" style="position:relative;width:100%;height:100vh;background-color:green;"><span>DIV</span></div>-->
+    <div id="target" style="position:-webkit-sticky;position:sticky;width:100%;height:100vh;background-color:green;">div</div>
+    <button id="toast-0">toast-0</button>
+    <button id="toast-1">toast-1</button>
+    <button id="toast-2">toast-2</button>
+    <button id="toast-3">toast-3</button>
+    <textarea id="ta">Some text.</textarea>
+    <script>
+        document.querySelector(`#toast-0`).addEventListener('click', (event) => {
+            Toastify({
+                text: "トーストを表示します",
+            }).showToast();
+        });
+        document.querySelector(`#toast-1`).addEventListener('click', (event) => {
+            Toastify({
+                text: "トーストを表示します",
+                duration: 3000,
+                backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                className: "info",
+            }).showToast();
+        });
+        document.querySelector(`#toast-2`).addEventListener('click', (event) => {
+            Toastify({
+                text: "トーストを表示します",
+                gravity: 'bottom', // bottom/top
+                position: 'center', // left/center/right
+                destination: 'https://github.com/apvarun/toastify-js',
+                newWindow: true,
+            }).showToast();
+        });
+        document.querySelector(`#toast-3`).addEventListener('click', (event) => {
+            Toastify({
+                text: "テキストエリアにトーストを表示…できませんでした。<br>改行します。",
+                duration: 3000,
+                selector: `target`,
+            }).showToast();
+        });
+
+
+    </script>
+</body>
