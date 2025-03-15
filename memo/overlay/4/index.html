@@ -1,0 +1,20 @@
+<input type="number" min="0" max="10" value="2"><input type="text" value ="TextValue"><span contenteditable>TextValue</span>
+<script>
+document.querySelector('input[type="number"]').addEventListener('input', (e)=>{
+    console.log(`${e.target.value}`)
+    //const target = document.querySelector('input[type="text"]').firstChild;
+    //const target = document.querySelector('input[type="text"]');
+    const target = document.querySelector('span[contenteditable]').firstChild;
+    console.log(target)
+    target.parentElement.focus();
+    const sel = window.getSelection();
+    const range = document.createRange();
+    const offset = e.target.value < target.length ? e.target.value : target.length;
+    range.setStart(target, offset);
+    range.setEnd(target, offset);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    console.log(range);
+//    e.target.focus();
+});
+</script>

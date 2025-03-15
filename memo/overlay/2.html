@@ -1,0 +1,109 @@
+<head>
+<style>
+div,button,textarea{margin:0;padding:0;box-sizing:border-box;}
+</style>
+</head>
+<body>
+<span style="display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</span>
+<!--<div name="editor" style="position:relative;top:0;left:0;">-->
+<!--<div name="editor" style="position:relative;margin:0;padding:0;box-sizing:border-box;">-->
+<div name="editor" style="position:fixed;margin:0;padding:0;box-sizing:border-box;">
+  <textarea style="position:absolute;top:0;left:0;box-sizing:border-box;width:300px;height:50vh;">alert('Hello World !!');</textarea>
+  <!--
+  <div name="filename" style="position:absolute;top:0;bottom:0;margin-top:auto;margin-bottom:auto;margin-left:auto;margin-right:auto;left:0;right:0;max-width:fit-content;max-width:-moz-fit-content;max-height:fit-content;max-height:-moz-fit-content;">
+  -->
+  <div name="file-state" style="position:absolute;top:0;margin-top:auto;margin-bottom:auto;margin-left:auto;margin-right:auto;left:0;right:0;max-width:fit-content;max-width:-moz-fit-content;max-height:fit-content;max-height:-moz-fit-content;">
+    <!-- fit-sizing Chrome120以降 -->
+    <!-- size 合わない。字数が増えるごとに徐々に大きくなっていく… -->
+    <span name="filename" contenteditable style="display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">some-{now}.txt</span>
+    <!--
+    <input name="filename" type="text" value="some-{now}.txt" minlength="1">
+    <div name="filename-2" contenteditable>some-{now}.txt</div>
+    <input name="filename-3" type="text" value="some-{now}.txt" style="position:absolute;">
+    -->
+  </div>
+  <div name="menu" style="position:absolute;top:0;right:0;margin-left:auto;margin-right:auto;max-width:fit-content;max-width:-moz-fit-content;box-sizing:border-box;background-color:yellow;">
+    <button>📋</button><button>📄</button>
+  </div>
+</div>
+<script>
+function onResize(entries, observer) {
+    console.log('resize!!');
+    const inlineSize = entries[0].contentBoxSize
+        ? (entries[0].contentBoxSize[0])
+            ? entries[0].contentBoxSize[0].inlineSize // 最新
+            : entries[0].contentBoxSize.inlineSize    // 古いFirefox
+        : entry.contentRect.width;                    // 将来廃止
+    const blockSize = entries[0].contentBoxSize
+        ? (entries[0].contentBoxSize[0])
+            ? entries[0].contentBoxSize[0].blockSize // 最新
+            : entries[0].contentBoxSize.blockSize    // 古いFirefox
+        : entry.contentRect.height;                   // 将来廃止
+    document.querySelector('[name="editor"]').style.inlineSize = `${inlineSize}px`;
+    //document.querySelector('[name="file-state"]').style.top = `${blockSize}px`;
+    const b = document.querySelector('[name="file-state"]').getBoundingClientRect();
+    document.querySelector('[name="file-state"]').style.top = `${parseInt(blockSize - b.height)}px`;
+    document.querySelector('[name="filename"]').style.maxWidth = `${parseInt(inlineSize)}px`;
+}
+const observer = new ResizeObserver(onResize);
+observer.observe(document.querySelector('textarea'));
+/*
+function resizeTextBox(e) {
+    // field-sizing: chrome 120以降 https://developer.mozilla.org/ja/docs/Web/CSS/field-sizing
+    // size: 徐々に大きくなってしまうorz
+    //e.target.setAttribute('size', e.target.value.length);
+    // width: 計算してセットする。
+    // https://qiita.com/jam/items/d3136d380663fd7bea6b
+    const fontSize = parseFloat(getComputedStyle(e.target).getPropertyValue('font-size')); //float型の数値に変換
+    const ls = parseFloat(getComputedStyle(e.target).getPropertyValue('letter-spacing')); //float型の数値に変換
+    const width = e.target.value.length * fontSize;
+    console.log(fontSize, ls);
+    console.log(width);
+//    e.target.setAttribute('width', `{width}px`);
+    e.target.style.setProperty('width', `{width}px`)
+}
+document.querySelector('[name="filename"]').addEventListener('input', async(e)=>resizeTextBox(e)});
+document.querySelector('[name="filename-2"]').addEventListener('input', async(e)=>resizeTextBox(e)});
+*/
+document.querySelector('[name="filename"]').addEventListener('input', async(e)=>{
+    // field-sizing: chrome 120以降 https://developer.mozilla.org/ja/docs/Web/CSS/field-sizing
+    // size: 徐々に大きくなってしまうorz
+    //e.target.setAttribute('size', e.target.value.length);
+    // width: 計算してセットする。
+    // https://qiita.com/jam/items/d3136d380663fd7bea6b
+    const fontSize = parseFloat(getComputedStyle(e.target).getPropertyValue('font-size')); //float型の数値に変換
+    const ls = parseFloat(getComputedStyle(e.target).getPropertyValue('letter-spacing')); //float型の数値に変換
+    console.log(fontSize, ls);
+    //const width = e.target.value.length * fontSize;
+    const text = e.target.value ?? e.target.textContent;
+    const width = text.length * fontSize;
+    console.log(width);
+//    e.target.setAttribute('width', `${width}px`);
+//    e.target.style.setProperty('width', `${width}px`)
+//    e.target.parentElement.style.setProperty('width', `${width}px`)
+//    e.target.style.setProperty('width', `${e.target.value.length}em`)
+});
+document.querySelector('[name="filename"]').addEventListener('keydown', async(e)=>{
+    if (!e.isComposing && 'Enter'===e.key){
+        e.preventDefault();
+        const sel = window.getSelection();
+//        sel.setStart(e.target, 0);
+//        sel.setEnd(e.target, 0);
+//        const range = document.selection.createRange();
+        const range = document.createRange();
+
+        range.setStart(sel.focusNode, 0);
+        range.setEnd(sel.focusNode, 1);
+//        range.setStart(e.target, 0);
+//        range.setEnd(e.target, 1);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        console.log(range);
+        document.querySelector('textarea').focus();
+    }
+});
+/*
+*/
+
+</script>
+</body>

@@ -1,0 +1,75 @@
+<head>
+<style>
+div,button,textarea{margin:0;padding:0;box-sizing:border-box;}
+</style>
+</head>
+<body>
+<!--<div name="editor" style="position:relative;top:0;left:0;">-->
+<!--<div name="editor" style="position:relative;margin:0;padding:0;box-sizing:border-box;">-->
+<div name="editor" style="position:fixed;margin:0;padding:0;box-sizing:border-box;">
+  <textarea style="position:absolute;top:0;left:0;box-sizing:border-box;">alert('Hello World !!');</textarea>
+  <!-- OK -->
+  <!--
+  <div name="menu" style="position:absolute;top:0;left:0;">
+  -->
+  <!-- NG -->
+  <!--
+  <div name="menu" style="position:absolute;top:0;right:0;max-width:fit-content;max-width:-moz-fit-content;">
+  <div name="menu" style="position:absolute;margin-left:auto;margin-right:auto;left:0;right:0;max-width:fit-content;max-width:-moz-fit-content;">
+margin-left:auto;margin-right:auto;max-width:fit-content;max-width:-moz-fit-content;
+  -->
+  <div name="menu" style="position:absolute;top:0;right:0;margin-left:auto;margin-right:auto;max-width:fit-content;max-width:-moz-fit-content;box-sizing:border-box;background-color:yellow;">
+    <button>📋</button><button>📄</button>
+  </div>
+  <!--
+  <div name="filename" style="position:absolute;bottom:0;margin-left:auto;margin-right:auto;left:0;right:0;max-width:fit-content;max-width:-moz-fit-content;">
+  -->
+  <div name="filename" style="position:absolute;top:0;bottom:0;margin-top:auto;margin-bottom:auto;margin-left:auto;margin-right:auto;left:0;right:0;max-width:fit-content;max-width:-moz-fit-content;max-height:fit-content;max-height:-moz-fit-content;">
+    <input type="text" value="some-{now}.txt">
+  </div>
+</div>
+<script>
+function onResize(entries, observer) {
+    console.log('resize!!');
+    const inlineSize = entries[0].contentBoxSize
+        ? (entries[0].contentBoxSize[0])
+            ? entries[0].contentBoxSize[0].inlineSize // 最新
+            : entries[0].contentBoxSize.inlineSize    // 古いFirefox
+        : entry.contentRect.width;                    // 将来廃止
+    document.querySelector('[name="editor"]').style.inlineSize = `${inlineSize}px`;
+//    document.querySelector('[name="menu"]').style.inlineSize = `${inlineSize}px`;
+}
+const observer = new ResizeObserver(onResize);
+observer.observe(document.querySelector('textarea'));
+//document.querySelector('textarea').
+/*
+const observer = new ResizeObserver((entries, observer)=>{
+    const inlineSize = entries[0].contentBoxSize
+        ? (entries[0].contentBoxSize[0])
+            ? entries[0].contentBoxSize[0].inlineSize // 最新
+            : entries[0].contentBoxSize.inlineSize    // 古いFirefox
+        : entry.contentRect.width;                    // 将来廃止
+    document.querySelector('menu').style.inlineSize = `${inlineSize}px`;
+});
+oveserver.observe(document.querySelector('textarea'));
+/*
+document.querySelector('textarea').addEventListener('resize',(e)=>{
+    e.target.
+});
+*/
+    /*
+    for (const entry of entries) {
+        if (entry.contentBoxSize) {
+            if (entry.contentBoxSize[0]) {//最新
+                entry.contentBoxSize[0].inlineSize
+            } else {//古いFilefox
+                entry.contentBoxSize.inlineSize
+            }
+        } else {//将来廃止
+            entry.contentRect.width
+        }
+    }
+    */
+
+</script>
+</body>
