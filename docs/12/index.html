@@ -21,13 +21,22 @@
 <!--
 <script src="js/textarea-indent.js"></script>
 -->
-
+<!--
 <script src="js/text-format.js"></script>
 <script src="js/indent-textarea.js"></script>
+-->
+
+<script src="js/field-sizing-input.js"></script>
+<script src="js/text-editor.js"></script>
 <script src="js/main.js"></script>
 </head>
 <body>
     <main>
+        <text-editor>alert('Hello JS !!');
+
+console.log('Hello JS !!');
+</text-editor>
+    <!--
         <textarea
             is="edit-or-view"
             mode="view" tab="hard2"
@@ -48,18 +57,6 @@
             mode="view" tab="soft4" switch-edit-mode-when-focused switch-view-mode-when-blur
             filename="some-{now}.txt" newline="\n"
             rows="5" cols="80" placeholder="Some text."></textarea>
-        <!--
-        <textarea
-            is="edit-or-view"
-            mode="view" tab="soft4"
-            filename="name=some-{now}.txt" newline="\n"
-            rows="5" cols="80" placeholder="Some text."></textarea>
-        <textarea
-            is="edit-or-view"
-            mode="view" tab="soft4"
-            file="charset=utf8-bom newline=LF tab=same name=some-{now}.txt lang=plain"
-            rows="5" cols="80" placeholder="Some text."></textarea>
-        -->
         <textarea is="edit-or-view" rows="5" cols="80" tab="soft2" newline="CRLF" show-confirm-when-dnd>12345678901234567890123456789012345678901234567890123456789012345678901234567890
 alert('Hello JS !!');
 
@@ -85,24 +82,7 @@ console.log('Hello JS !!');
 
 alert('Hello JS !!');
 </textarea>
-
-
-        <indent-textarea>A
-B
-</indent-textarea>
-        <!--
-        <textarea
-            is="indent-or-focus"
-            mode="view"
-            tab="hard2" newline="LF" filecharset="utf8" bom="bom"
-            filename="some-{now}.txt" filelang="plain"
-            rows="5" cols="80" placeholder="Some text."></textarea>
-        -->
-        <!--
-        <indent-textarea>
-            <pre slot="code" data-filename="some.js" data-lang="js"></span>
-        </indent-textarea>
-        -->
+-->
     </main>
     <footer></footer>
 </body>

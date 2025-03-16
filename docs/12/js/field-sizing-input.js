@@ -2,7 +2,6 @@ class FieldSizingInput extends HTMLElement {
     constructor() {
         super();
         this._shadow = this.attachShadow({mode:'open'});
-        console.log(this._shadow);
         this.#makeStyle();
         this.#makeEl();
         // フォーカスを失ったらキャレットを先頭に戻す
@@ -13,13 +12,13 @@ class FieldSizingInput extends HTMLElement {
     }
     #makeStyle(shadow) {
         const sheet = new CSSStyleSheet();
-        console.log(`local("${this._options.font.family}"),`)
         sheet.replaceSync(`
 :host {
     position: relative;
     display: inline-block;
     background: red;
     padding: 0px 4px;
+    box-sizing: border-box;
 }
 input {
     position: absolute;
@@ -27,7 +26,6 @@ input {
     left: 0;
     box-sizing: border-box;
     width: 100%;
-    margin: 0;
     text-overflow: ellipsis;
     overflow: hidden;
 }
@@ -69,15 +67,20 @@ input {
 //    adoptedCallback() {console.log("カスタム要素が新しいページへ移動されました。");}
     attributeChangedCallback(name, oldValue, newValue) {
 //        console.log(`属性 ${name} が変更されました。`);
-             if ('value'===name) {this.style.fontFamily=newValue}
+             if ('value'===name) {this.value=newValue}
         else if ('placeholder'===name) {this.placeholder=newValue}
-        else if ('font-size'===name) {this.style.fontSize=newValue}
+        else if ('font-size'===name) {this.fontSize=newValue}
         else if ('font-family'===name) {this.fontFamily=newValue}
-        else if ('max-width'===name) {this.style.maxWidth=newValue}
+        else if ('max-width'===name) {this.maxWidth=newValue}
     }
     static get observedAttributes() {return ['value', 'placeholder', 'font-family', 'font-size', 'max-width'];}
     get #inputEl() {return this._shadow.querySelector('input')}
     get #dummyEl() {return this._shadow.querySelector('.dummy')}
+    get value() {return this.#inputEl.value}
+    set value(v) {
+        this.#inputEl.value = v;
+        this.#dummyEl.textContent = v.replace(/\r\n|\r|\n/gm, '');
+    }
     get placeholder(){return this.#inputEl.placeholder}
     set placeholder(v) {
         this.#inputEl.placeholder = v;
@@ -94,6 +97,13 @@ input {
         this.#inputEl.style.fontSize= v;
         this.#dummyEl.style.fontSize= v;
         console.log(this.fontSize);
+    }
+    get maxWidth(){return getComputedStyle(this.#inputEl).maxWidth}
+    set maxWidth(v) {
+        this.style.maxWidth = v;
+//        this.#inputEl.style.maxWidth = v;
+//        this.#dummyEl.style.maxWidth = v;
+        console.log(this.maxWidth);
     }
 }
 customElements.define('field-sizing-input', FieldSizingInput);
