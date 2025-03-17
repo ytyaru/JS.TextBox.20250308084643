@@ -18,6 +18,9 @@ class FieldSizingInput extends HTMLElement {
     display: inline-block;
     background: red;
     padding: 0px 4px;
+    margin: 0;
+    line-height: 1em;
+    letter-spacing: 0;
     box-sizing: border-box;
 }
 input {

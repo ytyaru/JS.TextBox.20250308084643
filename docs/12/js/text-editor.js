@@ -3,6 +3,19 @@ class HTMLTextEditorElement extends HTMLElement {
     static get Modes() {return 'view edit'.split(' ')}
     constructor() {
         super();
+        /*
+        this.innerHTML = `
+<div name="editor" style="position:fixed;margin:0;padding:0;box-sizing:border-box;">
+  <textarea style="position:absolute;top:0;left:0;box-sizing:border-box;width:300px;height:50vh;">alert('Hello World !!');</textarea>
+  <div name="file-state" style="position:absolute;left:0;right:0;margin:0 auto;box-sizing:border-box;max-width:50%;width:fit-content;">
+    <field-sizing-input name="filename" value="some-{now}.txt" placeholder="some-{now}.txt" max-width="100%" font-size="12px"></field-sizing-input>
+  </div>
+  <div name="menu" style="position:absolute;top:0;right:0;margin-left:auto;margin-right:auto;max-width:fit-content;max-width:-moz-fit-content;box-sizing:border-box;background-color:yellow;">
+        <button>📋</button><button>📄</button>
+  </div>
+</div>
+`;
+        */
         this._shadow = this.attachShadow({mode:'open'});
         this._options = this.defaultOptions;
         this._switchEditModeFromDnD = false; // DnDされたか
@@ -12,6 +25,10 @@ class HTMLTextEditorElement extends HTMLElement {
         this.addEventListener('focus', async(e)=>this.onFocus(e));
         this.addEventListener('blur', async(e)=>{if(this.switchViewModeWhenBlur){this.mode='view'}});
     }
+    get #textarea() {return this._shadow.querySelector('textarea')}
+    get #help() {return this._shadow.querySelector('div.help')}
+    get #buttons() {return this._shadow.querySelector('div.buttons')}
+    get #fileState() {return this._shadow.querySelector('div.file-state')}
     //connectedCallback() {console.log("カスタム要素がページに追加されました。");}
     connectedCallback() {
         console.log("カスタム要素がページに追加されました。");
@@ -22,33 +39,40 @@ class HTMLTextEditorElement extends HTMLElement {
             console.log('setTimeout:', this.textContent);
             this.#makeStyle();
             this.#makeEl();
-        }, 0)
+        }, 0);
     }
     #makeStyle() {
         const sheet = new CSSStyleSheet();
         sheet.replaceSync(`
 :host {
-    position: relative; /*fixed*/
+    position: relative; /*fixed,relative*/
     display: block;
     box-sizing: border-box;
     margin:0; padding:0;
+    line-height:1em;
     background: red;
     width:100%; height:50vh;
 }
 textarea {
+    /*
     display: block;
+    */
     position: absolute;
     top:0; left:0;
     width: 100%; height: 100%;
 }
 div.help {
+    /*
     display: block;
+    */
     position: absolute;
     top:0; left:0;
     background: green;
 }
 div.ui {
+    /*
     display: block;
+    */
     position: relative;
     background: none;
     width: 100%;
@@ -65,11 +89,18 @@ div.file-state {
 div.buttons {
     position: absolute;
     top:0; right:0;
-    margin-left:auto; margin-right:auto;
-    max-width:fit-content;max-width:-moz-fit-content;
+    padding:0; margin:0;
+    line-height:1em;
     box-sizing: border-box;
     background-color: yellow;
 }
+/*
+div.buttons button {
+    padding:0; margin:0;
+    line-height:1em;
+    letter-spacing:0;
+}
+*/
 /*
 */
 `);
@@ -77,7 +108,9 @@ div.buttons {
     }
     #makeEl() {
         const textarea = document.createElement('textarea');
+        textarea.style.resize = 'none';
         const help = document.createElement('div');
+        help.classList.add('help');
         const ui = this.#makeUi();
         const input = document.createElement('input');
         console.log('#makeEl:', this.textContent);
@@ -97,17 +130,19 @@ div.buttons {
         const div = document.createElement('div');
         const copy = document.createElement('button');
         const download = document.createElement('button');
+        const mode = document.createElement('button');
         div.classList.add('buttons');
         copy.textContent = '📋';
         download.textContent = '📄';
-        div.append(copy, download);
+        mode.textContent = '👀';//✒
+        div.append(copy, download, mode);
         return div;
     }
     #makeUiFileStates() {
         const div = document.createElement('div');
         const input = document.createElement('field-sizing-input');
         const V = 'some-{now}.txt';
-        div.classList.add('file-states');
+        div.classList.add('file-state');
         input.placeholder = V;
         input.value = V;
         input.fontSize = '12px';
