@@ -51,7 +51,7 @@ class HTMLTextEditorElement extends HTMLElement {
     margin:0; padding:0;
     line-height:1em;
     background: red;
-    width:100%; height:50vh;
+    width:50%; height:50vh;
 }
 textarea {
     /*
@@ -65,6 +65,7 @@ div.help {
     /*
     display: block;
     */
+    display: none;
     position: absolute;
     top:0; left:0;
     background: green;
@@ -99,6 +100,7 @@ div.buttons button {
     padding:0; margin:0;
     line-height:1em;
     letter-spacing:0;
+    box-sizing: border-box;
 }
 */
 /*
