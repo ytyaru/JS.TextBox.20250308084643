@@ -1,0 +1,36 @@
+<head>
+<!--<link rel="stylesheet" href="../../docs/lib/toastify-js/1.9.3/custom.css">-->
+<!--<script src="../../docs/lib/toastify-js/1.9.3/min.js"></script>-->
+<script src="../../docs/lib/fscreen/fscreen.js"></script>
+</head>
+<body>
+    <p>フルスクリーン確認画面</p>
+    <p>fullscreenEnabled:<span id="fullscreenEnabled"></span></p>
+    <p>isFullscreen:<span id="isFullscreen"></span></p>
+    <button id="fullscreen">FullScreen</button>
+    <script>
+        document.querySelector(`#fullscreenEnabled`).textContent = fscreen.fullscreenEnabled.toString();
+        document.querySelector(`#isFullscreen`).textContent = fscreen.isFullscreen.toString();
+        if (fscreen.fullscreenEnabled) {
+            console.log();
+            fscreen.addEventListener('fullscreenchange', () =>{
+                console.log('fullScreen');
+                document.querySelector(`#fullscreenEnabled`).textContent = fscreen.fullscreenEnabled.toString();
+                document.querySelector(`#isFullscreen`).textContent = fscreen.isFullscreen.toString();
+            });
+            fscreen.addEventListener('fullscreenerror', () =>{
+                alert('Not support FullScreen.')
+            });
+        }
+        document.querySelector(`#fullscreen`).addEventListener('click', (e)=>{
+            fscreen.requestFullscreen(document.documentElement);
+        });
+        document.addEventListener('keydown', (e)=>{
+            if ('F11'===e.key) {
+                e.preventDefault();
+                console.log(e.key)
+                fscreen.toggle();
+            }
+        });
+    </script>
+</body>

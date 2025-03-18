@@ -1,0 +1,61 @@
+<head>
+<!--<link rel="stylesheet" href="../../docs/lib/toastify-js/1.9.3/custom.css">-->
+<!--<script src="../../docs/lib/toastify-js/1.9.3/min.js"></script>-->
+<script src="../../docs/lib/fscreen/fscreen.js"></script>
+</head>
+<body>
+    <p>フルスクリーン確認画面</p>
+    <p>fullscreenEnabled:<span id="fullscreenEnabled"></span></p>
+    <p>isFullscreen:<span id="isFullscreen"></span></p>
+    <button id="fullscreen">FullScreen</button>
+    <script>
+        /*
+        if (fscreen.isFullscreen) {
+            fscreen.exitFullscreen();
+        } else {
+            fscreen.requestFullscreen(document.body);
+        }
+        window.addEventListener('fullscreenchange', (e)=>{
+            console.log('fullScreen');
+            document.querySelector(`#fullscreenEnabled`).textContent = fscreen.fullscreenEnabled.toString();
+            document.querySelector(`#isFullscreen`).textContent = fscreen.isFullscreen.toString();
+        });
+        */
+        document.querySelector(`#fullscreenEnabled`).textContent = fscreen.fullscreenEnabled.toString();
+        document.querySelector(`#isFullscreen`).textContent = fscreen.isFullscreen.toString();
+
+        if (fscreen.fullscreenEnabled) {
+            console.log();
+            fscreen.addEventListener('fullscreenchange', () =>{
+                console.log('fullScreen');
+                document.querySelector(`#fullscreenEnabled`).textContent = fscreen.fullscreenEnabled.toString();
+                document.querySelector(`#isFullscreen`).textContent = fscreen.isFullscreen.toString();
+            });
+            fscreen.addEventListener('fullscreenerror', () =>{
+                alert('Not support FullScreen.')
+            });
+        }
+
+        document.querySelector(`#fullscreen`).addEventListener('click', (e)=>{
+            fscreen.requestFullscreen(document.documentElement);
+        });
+        document.addEventListener('keydown', (e)=>{
+            console.log(e.key)
+            if ('F11'===e.key) {
+                e.preventDefault();
+                /*
+                console.log('F11')
+                if (fscreen.isFullscreen) {fscreen.exitFullscreen()}
+                else {fscreen.requestFullscreen()}
+                */
+                fscreen.toggle();
+            }
+//            fscreen.requestFullscreen(document.documentElement);
+        });
+        /*
+        document.addEventListener('resize', (e)=>{
+            fscreen.requestFullscreen(document.documentElement);
+        });
+        */
+    </script>
+</body>
