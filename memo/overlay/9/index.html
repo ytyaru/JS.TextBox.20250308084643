@@ -1,0 +1,161 @@
+<head>
+<script src="../../../docs/lib/util/event/resize-observer-x.js"></script>
+<style>
+</style>
+<script src="field-sizing-input.js"></script>
+<script src="overlay-box.js"></script>
+</head>
+<body>
+<script>
+/*
+const ob = new OverlayBox({
+});
+document.body.append(ob.el);
+*/
+</script>
+</body>
+    <overlay-box></overlay-box>
+<!--
+<div name="editor">
+  <textarea style="">alert('Hello World !!');</textarea>
+</div>
+-->
+<!--
+<span style="display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</span>
+<div name="editor" style="position:fixed;margin:0;padding:0;box-sizing:border-box;">
+  <textarea style="position:absolute;top:0;left:0;box-sizing:border-box;width:300px;height:50vh;">alert('Hello World !!');</textarea>
+  <div name="file-state" style="position:absolute;left:0;right:0;margin:0 auto;box-sizing:border-box;max-width:50%;width:fit-content;">
+    <field-sizing-input name="filename" value="some-{now}.txt" placeholder="some-{now}.txt" max-width="100%" font-size="12px"></field-sizing-input>
+  </div>
+  <div name="menu" style="position:absolute;top:0;right:0;margin-left:auto;margin-right:auto;max-width:fit-content;max-width:-moz-fit-content;box-sizing:border-box;background-color:yellow;">
+        <button>📋</button><button>📄</button>
+  </div>
+
+  </div>
+</div>
+-->
+
+<!--
+/*
+document.querySelector(`div[name="editor"]`).append(ob.el);
+(new ResizeObserverX((entries,observer)=>{
+    const E = entries[0].target;
+    const B = entries[0].border[0];
+    //const T = document.querySelector(`div[name="overlay-box"]`);
+    const T = ob.el;
+    E.style.contentVisibility = 'hidden';
+    T.style.width = B.width;
+    T.style.height = B.height;
+    E.style.contentVisibility = 'visible';
+})).observe(document.querySelector(`textarea`));
+//})).observe(document.querySelector(`div[name="editor"]`));
+*/
+/*
+document.querySelector(`div[name="editor"]`).addEventListener('resize', ()=>{
+    ob.style.width = document.querySelector(`div[name="editor"]`).style.width:
+});
+*/
+/*
+function onResize(entries, observer) {
+    console.log('resize!!');
+    const inlineSize = entries[0].contentBoxSize
+        ? (entries[0].contentBoxSize[0])
+            ? entries[0].contentBoxSize[0].inlineSize // 最新
+            : entries[0].contentBoxSize.inlineSize    // 古いFirefox
+        : entry.contentRect.width;                    // 将来廃止
+    const blockSize = entries[0].contentBoxSize
+        ? (entries[0].contentBoxSize[0])
+            ? entries[0].contentBoxSize[0].blockSize // 最新
+            : entries[0].contentBoxSize.blockSize    // 古いFirefox
+        : entry.contentRect.height;                   // 将来廃止
+    document.querySelector('[name="editor"]').style.inlineSize = `${inlineSize}px`;
+    //document.querySelector('[name="file-state"]').style.top = `${blockSize}px`;
+    const b = document.querySelector('[name="file-state"]').getBoundingClientRect();
+    document.querySelector('[name="file-state"]').style.top = `${parseInt(blockSize - b.height)}px`;
+//    document.querySelector('[name="filename"]').style.maxWidth = `${parseInt(inlineSize)}px`;
+}
+const observer = new ResizeObserver(onResize);
+observer.observe(document.querySelector('textarea'));
+console.log(document.querySelector('[name="filename"]'))
+console.log(document.querySelector('[name="filename"] input'))
+console.log(document.querySelector('[name="filename"]').shadowRoot)
+console.log(document.querySelector('[name="filename"]').shadowRoot.querySelector('input'))
+
+document.querySelector('[name="filename"]').shadowRoot.querySelector('input').addEventListener('keydown', async(e)=>{
+    if (!e.isComposing && 'Enter'===e.key) {
+        e.preventDefault();
+        console.log(e.target.value);
+        document.querySelector('textarea').focus();
+    }
+});
+*/
+/*
+document.querySelector('[name="filename"] input').addEventListener('input', async(e)=>{
+    console.log(e.target.value);
+});
+*/
+/*
+document.querySelector('[name="filename"]').addEventListener('input', async(e)=>{
+    // field-sizing: chrome 120以降 https://developer.mozilla.org/ja/docs/Web/CSS/field-sizing
+    // size: 徐々に大きくなってしまうorz
+    //e.target.setAttribute('size', e.target.value.length);
+    // width: 計算してセットする。
+    // https://qiita.com/jam/items/d3136d380663fd7bea6b
+    const fontSize = parseFloat(getComputedStyle(e.target).getPropertyValue('font-size')); //float型の数値に変換
+    const ls = parseFloat(getComputedStyle(e.target).getPropertyValue('letter-spacing')); //float型の数値に変換
+    console.log(fontSize, ls);
+    //const width = e.target.value.length * fontSize;
+    const text = e.target.value ?? e.target.textContent;
+    const width = text.length * fontSize;
+    console.log(width);
+//    e.target.setAttribute('width', `${width}px`);
+//    e.target.style.setProperty('width', `${width}px`)
+//    e.target.parentElement.style.setProperty('width', `${width}px`)
+//    e.target.style.setProperty('width', `${e.target.value.length}em`)
+});
+document.querySelector('[name="filename"]').addEventListener('keydown', async(e)=>{
+    if (!e.isComposing && 'Enter'===e.key){
+        e.preventDefault();
+        const target = e.target.firstChild;
+        const sel = window.getSelection();
+        const range = document.createRange();
+        const offset = 5;
+        //https://qiita.com/zaru/items/77ee6a7f23cca112f92d
+        console.log(target)
+        range.setStart(target, offset);
+        range.setEnd(target, offset);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        console.log(range);
+        document.querySelector('textarea').focus();
+    }
+});
+*/
+/*
+*/
+/*
+document.querySelector('[name="filename"]').addEventListener('input', async(e)=>{
+    console.log(e.inputType)
+    if ('insertParagraph'===e.inputType) {
+        e.preventDefault();
+        console.log('-------------')
+        const target = e.target.firstChild;
+        console.log(target);
+        const sel = window.getSelection();
+        const range = document.createRange();
+        const offset = 5;
+        //https://qiita.com/zaru/items/77ee6a7f23cca112f92d
+//        console.log(e.target.childNodes[0])
+//        console.log(e.target.firstChild)
+//        range.setStart(e.target.firstChild, offset);
+//        range.setEnd(e.target.firstChild, offset);
+        range.setStart(target, offset);
+        range.setEnd(target, offset);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        console.log(range);
+        document.querySelector('textarea').focus();
+    }
+});
+*/
+-->
