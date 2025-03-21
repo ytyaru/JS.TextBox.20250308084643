@@ -54,6 +54,19 @@ div[name="overlay-area"] {
     width:100%; height:100%;
     pointer-events: none; /*マウスイベント透過*/
 }
+div[name="overlay-area"] .child {
+    position: absolute;
+    box-sizing: border-box;
+}
+div[name="top-left"] {top:0; left:0; background-color:red;}
+div[name="top"] {left:0; right:0; margin:0 auto; background-color:green;}
+div[name="top-right"] {top:0; right:0; background-color:blue;}
+div[name="left"] {top:0; bottom:0; left:0; margin:auto 0;}
+div[name="center"] {inset:0; margin:auto;}
+div[name="right"] {top:0; bottom:0; right:0; margin:auto 0;}
+div[name="bottom-left"] {bottom:0; left:0;}
+div[name="bottom"] {bottom:0; left:0; right:0; margin:0 auto;}
+div[name="bottom-right"] {bottom:0; right:0;}
 `;
         return style;
     }
@@ -90,11 +103,16 @@ div[name="overlay-area"] {
             type1: 'top-left top top-right left center right bottom-left bottom bottom-right'.split(' '),
             type2: 'north-west north north-east west center east south-west south south-east'.split(' '),
         }
-        console.log(this.children)
-        console.log([...this.children].map(el=>el.getAttribute('name')))
-        console.log(NAMES.type1)
-        console.log(NAMES.type2)
-        for (let el of this.children) {console.log(el.getAttribute('name'),NAMES.type1.includes(el.getAttribute('name')));if ([1,2].map(v=>NAMES[`type${v}`].includes(el.getAttribute('name')))) {area.append(el)}}
+        // 対象要素のみ取得する。余計な要素は消す。
+        for (let node of this.childNodes) {
+            if (Node.ELEMENT_NODE===node.nodeType) {
+                if ([1,2].map(v=>NAMES[`type${v}`].includes(node.getAttribute('name'))).some(v=>v)) {
+                    node.classList.add('child');
+                    area.append(node)
+                }
+                else {node.remove()}
+            }
+        }
         return area;
     }
     #addEvent() {
