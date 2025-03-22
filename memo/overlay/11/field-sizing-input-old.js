@@ -68,8 +68,7 @@ class FieldSizingInput extends HTMLElement {
     }
     resize() {
         const parentWidth = parseInt(getComputedStyle(this.parentElement.parentElement).width);
-        const fontSize = parseInt(getComputedStyle(this).fontSize)
-        const width = this.#dummyEl.clientWidth + (fontSize/2); // dummyに比べinputは微妙に小さく見切れるので半文字分大きくする
+        const width = this.#dummyEl.clientWidth + 4;
         this.#inputEl.style.width = `${Math.min(width, parentWidth)}px`;
         console.log(parentWidth, width, this.#inputEl.style.width)
     }

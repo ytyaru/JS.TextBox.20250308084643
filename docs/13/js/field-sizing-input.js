@@ -17,31 +17,31 @@ class FieldSizingInput extends HTMLElement {
     position: relative;
     display: inline-block;
     background: red;
-    padding: 0px 4px;
-    margin: 0;
-    line-height: 1em;
-    letter-spacing: 0;
-    box-sizing: border-box;
+    max-width: 100%;
 }
-input {
+:host input {
+    box-sizing: border-box;
     position: absolute;
     top: 0;
     left: 0;
-    box-sizing: border-box;
-    width: 100%;
+    height: 100%;
     text-overflow: ellipsis;
     overflow: hidden;
+    white-space: nowrap;
 }
-.dummy {
+:host .dummy {
+    background-color:red;
     font-size: 16px;
     display: inline-block;
     overflow: hidden;
     white-space: nowrap;
     opacity: 0;
+    box-sizing: border-box;
+    max-width: 100%;
 }
-.dummy::before {content: '';}
-.dummy:empty::before {content: attr(data-placeholder);}
-.font {
+:host .dummy::before {content: '';}
+:host .dummy:empty::before {content: attr(data-placeholder);}
+:host .font {
     font-family: monoscape;
     font-size: 16px;
     box-sizing: border-box;
@@ -61,9 +61,22 @@ input {
         dummy.dataset.placeholder = 'プレースホルダー';
         input.placeholder = 'プレースホルダー';
         input.addEventListener('input', (e)=>{
-            this._shadow.querySelector('.dummy').textContent = e.target.value;
+            this.#dummyEl.textContent = e.target.value;
+            this.resize();
         });
         this._shadow.append(dummy, input);
+    }
+    resize() {
+        const parentWidth = parseInt(getComputedStyle(this.parentElement.parentElement).width);
+        const fontSize = parseInt(getComputedStyle(this).fontSize)
+        const width = this.#dummyEl.clientWidth + (fontSize/2); // dummyに比べinputは微妙に小さく見切れるので半文字分大きくする
+        this.#inputEl.style.width = `${Math.min(width, parentWidth)}px`;
+        console.log(parentWidth, width, this.#inputEl.style.width)
+    }
+    connectedCallback() {
+//        console.log("カスタム要素がページに追加されました。");
+//        console.log(`${this.#dummyEl.clientWidth + 4}px`)
+        this.resize()
     }
 //    connectedCallback() {console.log("カスタム要素がページに追加されました。");}
 //    disconnectedCallback() {console.log("カスタム要素がページから除去されました。");}
@@ -83,6 +96,7 @@ input {
     set value(v) {
         this.#inputEl.value = v;
         this.#dummyEl.textContent = v.replace(/\r\n|\r|\n/gm, '');
+        this.resize();
     }
     get placeholder(){return this.#inputEl.placeholder}
     set placeholder(v) {
