@@ -58,14 +58,26 @@ div[name="overlay-area"] .child {
     position: absolute;
     box-sizing: border-box;
 }
+/*
 div[name="top-left"] {top:0; left:0; background-color:red;}
-div[name="top"] {left:0; right:0; margin:0 auto; background-color:green;}
+div[name="top"] {left:0; right:0; margin:0 auto; background-color:green; max-width:fit-content;}
 div[name="top-right"] {top:0; right:0; background-color:blue;}
-div[name="left"] {top:0; bottom:0; left:0; margin:auto 0;}
-div[name="center"] {inset:0; margin:auto;}
-div[name="right"] {top:0; bottom:0; right:0; margin:auto 0;}
+div[name="left"] {top:0; bottom:0; margin:auto 0; max-width:fit-content;}
+div[name="center"] {inset:0; margin:auto; max-width:fit-content;}
+div[name="right"] {top:0; bottom:0; right:0; margin:auto 0; max-width:fit-content;}
 div[name="bottom-left"] {bottom:0; left:0;}
-div[name="bottom"] {bottom:0; left:0; right:0; margin:0 auto;}
+div[name="bottom"] {bottom:0; left:0; right:0; margin:0 auto; max-width:fit-content;}
+div[name="bottom-right"] {bottom:0; right:0;}
+*/
+
+div[name="top-left"] {top:0; left:0;}
+div[name="top"] {top:0; left:50%; transform:translate(-50%,0); max-width:fit-content;}
+div[name="top-right"] {top:0; right:0;}
+div[name="left"] {top:50%; left:0; transform:translate(0,-50%); max-width:fit-content;}
+div[name="center"] {top:50%; left:50%; transform:translate(-50%,-50%); max-width:fit-content;}
+div[name="right"] {top:50%; right:0; transform:translate(0,-50%); max-width:fit-content;}
+div[name="bottom-left"] {bottom:0; left:0;}
+div[name="bottom"] {bottom:0; left:50%; transform:translate(-50%,0); max-width:fit-content;}
 div[name="bottom-right"] {bottom:0; right:0;}
 `;
         return style;
